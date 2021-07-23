@@ -16,6 +16,6 @@ type Filter interface {
 	// FindAll 用于查找出所有敏感词
 	FindAll(text string) []string
 
-	// ReplaceRune 用于替换敏感词
+	// Replace 用于替换敏感词
 	Replace(text string, replace rune) string
 }

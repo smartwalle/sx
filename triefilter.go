@@ -67,6 +67,7 @@ func (this *TrieFilter) addNode(index int, word string) {
 		if unicode.IsSpace(r) {
 			continue
 		}
+		r = this.toLower(r)
 
 		if _, ok := node.children[r]; !ok {
 			node.children[r] = newTrieNode()
@@ -75,6 +76,13 @@ func (this *TrieFilter) addNode(index int, word string) {
 	}
 	node.index = index
 	node.end = true
+}
+
+func (this *TrieFilter) toLower(r rune) rune {
+	if r >= 65 && r <= 90 {
+		r += 32
+	}
+	return r
 }
 
 func (this *TrieFilter) skip(r rune) bool {
@@ -92,7 +100,7 @@ func (this *TrieFilter) inExclude(r rune) bool {
 
 func (this *TrieFilter) Excludes(items ...rune) {
 	for _, item := range items {
-		this.excludes[item] = struct{}{}
+		this.excludes[this.toLower(item)] = struct{}{}
 	}
 }
 
@@ -101,6 +109,8 @@ func (this *TrieFilter) Contains(text string) bool {
 	var tChars = []rune(text)
 
 	for _, r := range tChars {
+		r = this.toLower(r)
+
 		if this.skip(r) {
 			continue
 		}
@@ -126,7 +136,9 @@ func (this *TrieFilter) FindFirst(text string) string {
 	defer this.pool.Put(nBuf)
 
 	for _, r := range tChars {
-		if this.skip(r) {
+		var nr = this.toLower(r)
+
+		if this.skip(nr) {
 			if node == nil {
 				nBuf.Reset()
 			} else {
@@ -136,11 +148,11 @@ func (this *TrieFilter) FindFirst(text string) string {
 		}
 
 		if node != nil {
-			node = node.getNode(r)
+			node = node.getNode(nr)
 		}
 		if node == nil {
 			nBuf.Reset()
-			node = this.root.getNode(r)
+			node = this.root.getNode(nr)
 		}
 
 		nBuf.WriteRune(r)
@@ -161,7 +173,9 @@ func (this *TrieFilter) FindAll(text string) []string {
 	var nText []string
 
 	for _, r := range tChars {
-		if this.skip(r) {
+		var nr = this.toLower(r)
+
+		if this.skip(nr) {
 			if node == nil {
 				nBuf.Reset()
 			} else {
@@ -171,11 +185,11 @@ func (this *TrieFilter) FindAll(text string) []string {
 		}
 
 		if node != nil {
-			node = node.getNode(r)
+			node = node.getNode(nr)
 		}
 		if node == nil {
 			nBuf.Reset()
-			node = this.root.getNode(r)
+			node = this.root.getNode(nr)
 		}
 
 		nBuf.WriteRune(r)
@@ -196,6 +210,8 @@ func (this *TrieFilter) Replace(text string, replace rune) string {
 
 	var start = -1
 	for i, r := range tChars {
+		r = this.toLower(r)
+
 		if this.skip(r) {
 			continue
 		}
