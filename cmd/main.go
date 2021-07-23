@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	sx "github.com/smartwalle/dbm"
+	"github.com/smartwalle/sx"
 )
 
 func main() {
@@ -18,9 +18,9 @@ func main() {
 	fmt.Println(filter.FindFirst("s福音会"))  // bug
 	fmt.Println(filter.FindAll("sss刘广智空军sss福音会"))
 	fmt.Println(filter.FindAll("sstrychnine福音会"))
-	fmt.Println(filter.ReplaceRune("s刘广智空军sss福音会", '*'))
-	fmt.Println(filter.ReplaceRune("刘广智空军sss福音会", '*'))
-	fmt.Println(filter.ReplaceRune("world刘广智-空军hello福音会", '*'))
-	fmt.Println(filter.ReplaceRune("hello", '*'))
-	fmt.Println(filter.ReplaceRune("w", '*'))
+	fmt.Println(filter.Replace("s刘广智空军sss福音会", '*'))
+	fmt.Println(filter.Replace("刘广智空军sss福音会", '*'))
+	fmt.Println(filter.Replace("world刘广智-空军hello福音会", '*'))
+	fmt.Println(filter.Replace("hello", '*'))
+	fmt.Println(filter.Replace("w", '*'))
 }

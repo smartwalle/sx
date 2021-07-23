@@ -190,7 +190,7 @@ func (this *TrieFilter) FindAll(text string) []string {
 	return nText
 }
 
-func (this *TrieFilter) ReplaceRune(text string, replace rune) string {
+func (this *TrieFilter) Replace(text string, replace rune) string {
 	var node *trieNode
 	var tChars = []rune(text)
 

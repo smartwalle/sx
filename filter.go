@@ -17,5 +17,5 @@ type Filter interface {
 	FindAll(text string) []string
 
 	// ReplaceRune 用于替换敏感词
-	ReplaceRune(text string, replace rune) string
+	Replace(text string, replace rune) string
 }

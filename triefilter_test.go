@@ -1,7 +1,7 @@
 package sx_test
 
 import (
-	sx "github.com/smartwalle/dbm"
+	sx "github.com/smartwalle/sx"
 	"testing"
 )
 
@@ -44,6 +44,6 @@ func BenchmarkTrieFilter_ReplaceRune(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		filter.ReplaceRune("台“[中国教徒]”造谣大陆没报道郑州水灾，被连线观众[清海无上师]当场打脸", '*')
+		filter.Replace("台“[中国教徒]”造谣大陆没报道郑州水灾，被连线观众[清海无上师]当场打脸", '*')
 	}
 }
