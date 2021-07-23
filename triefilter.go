@@ -194,7 +194,7 @@ func (this *TrieFilter) ReplaceRune(text string, replace rune) string {
 	var node *trieNode
 	var tChars = []rune(text)
 
-	var start = 0
+	var start = -1
 	for i, r := range tChars {
 		if this.skip(r) {
 			continue
