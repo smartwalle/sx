@@ -1,3 +1,3 @@
-module github.com/smartwalle/dbm
+module github.com/smartwalle/sx
 
 go 1.16
