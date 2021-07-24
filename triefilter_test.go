@@ -1,7 +1,7 @@
 package sx_test
 
 import (
-	sx "github.com/smartwalle/sx"
+	"github.com/smartwalle/sx"
 	"testing"
 )
 
