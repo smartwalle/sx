@@ -246,7 +246,7 @@ func BenchmarkTrieFilter_FindAll(b *testing.B) {
 	}
 }
 
-func BenchmarkTrieFilter_ReplaceRune(b *testing.B) {
+func BenchmarkTrieFilter_Replace(b *testing.B) {
 	var filter = getFilter()
 	b.ResetTimer()
 
