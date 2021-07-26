@@ -64,7 +64,7 @@ func (this *TrieFilter) addNode(word string) {
 		if unicode.IsSpace(r) {
 			continue
 		}
-		r = this.toLower(r)
+		r = clear(r)
 
 		_, exists := node.children[r]
 		if exists {
@@ -99,13 +99,6 @@ func (this *TrieFilter) addNode(word string) {
 	}
 }
 
-func (this *TrieFilter) toLower(r rune) rune {
-	if r >= 65 && r <= 90 {
-		r += 32
-	}
-	return r
-}
-
 func (this *TrieFilter) skip(r rune) bool {
 	// 太影响效率
 	if /* unicode.IsSpace(r) || unicode.IsPunct(r) || */ this.inExclude(r) {
@@ -121,7 +114,7 @@ func (this *TrieFilter) inExclude(r rune) bool {
 
 func (this *TrieFilter) Excludes(items ...rune) {
 	for _, item := range items {
-		this.excludes[this.toLower(item)] = struct{}{}
+		this.excludes[clear(item)] = struct{}{}
 	}
 }
 
@@ -130,7 +123,7 @@ func (this *TrieFilter) Contains(text string) bool {
 	var tChars = []rune(text)
 
 	for _, r := range tChars {
-		r = this.toLower(r)
+		r = clear(r)
 
 		if this.skip(r) {
 			continue
@@ -157,7 +150,7 @@ func (this *TrieFilter) FindFirst(text string) string {
 	defer this.pool.Put(nBuf)
 
 	for _, r := range tChars {
-		var nr = this.toLower(r)
+		var nr = clear(r)
 
 		if this.skip(nr) {
 			if node.valid {
@@ -194,7 +187,7 @@ func (this *TrieFilter) FindAll(text string) []string {
 	var nText []string
 
 	for _, r := range tChars {
-		var nr = this.toLower(r)
+		var nr = clear(r)
 
 		if this.skip(nr) {
 			if node.valid {
@@ -231,7 +224,7 @@ func (this *TrieFilter) Replace(text string, replace rune) string {
 
 	var start = -1
 	for i, r := range tChars {
-		r = this.toLower(r)
+		r = clear(r)
 
 		if this.skip(r) {
 			continue

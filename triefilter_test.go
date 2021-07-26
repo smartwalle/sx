@@ -6,7 +6,7 @@ import (
 )
 
 func getFilter() sx.Filter {
-	var stock, _ = sx.NewMemoryStock("福音会", "中国教徒", "统一教", "观音法门", "清海无上师", "盘古", "李洪志", "志洪李", "李宏志", "轮功", "法轮", "轮法功", "三去车仑", "wtf")
+	var stock, _ = sx.NewMemoryStock("!", "福音会", "中国教徒", "统一教", "观音法门", "清海无上师", "盘古", "李洪志", "志洪李", "李宏志", "轮功", "法轮", "轮法功", "三去车仑", "wtf")
 	var filter = sx.NewTrieFilter(stock)
 	filter.Excludes('-')
 	return filter
@@ -19,6 +19,7 @@ func TestTrieFilter_Contains(t *testing.T) {
 		text   string
 		expect bool
 	}{
+		{"！", true},
 		{"福音会", true},
 		{"-福音会", true},
 		{"--福音会", true},
@@ -46,6 +47,8 @@ func TestTrieFilter_Contains(t *testing.T) {
 		{"WTf is a type passed to Test", true},
 		{"WTF is a type passed to Test", true},
 		{"W-TF is a type passed to Test", true},
+		{"ｗｔｆ", true},
+		{"ＷＴｆ", true},
 		{"清海无上师是福音会的中国教徒", true},
 		{".福音会", true},
 		{"福音会.", true},
