@@ -18,9 +18,8 @@ func newTrieNode() *trieNode {
 	}
 }
 
-func (this *trieNode) getNode(r rune) *trieNode {
-	var node = this.children[r]
-	return node
+func (node *trieNode) getNode(r rune) *trieNode {
+	return node.children[r]
 }
 
 type TrieFilter struct {
@@ -35,13 +34,13 @@ func NewTrieFilter(stock WordStock) *TrieFilter {
 	return t
 }
 
-func (this *TrieFilter) prepare(stock WordStock) {
-	this.pool = &sync.Pool{
+func (filter *TrieFilter) prepare(stock WordStock) {
+	filter.pool = &sync.Pool{
 		New: func() interface{} {
 			return &bytes.Buffer{}
 		},
 	}
-	this.root = newTrieNode()
+	filter.root = newTrieNode()
 
 	var words = stock.ReadAll()
 
@@ -50,14 +49,14 @@ func (this *TrieFilter) prepare(stock WordStock) {
 		if len(word) == 0 {
 			continue
 		}
-		this.addNode(word)
+		filter.addNode(word)
 	}
-	this.excludes = make(map[rune]struct{})
+	filter.excludes = make(map[rune]struct{})
 	return
 }
 
-func (this *TrieFilter) addNode(word string) {
-	var node = this.root
+func (filter *TrieFilter) addNode(word string) {
+	var node = filter.root
 	var wChars = []rune(word)
 
 	for _, r := range wChars {
@@ -74,33 +73,33 @@ func (this *TrieFilter) addNode(word string) {
 	node.end = true
 }
 
-func (this *TrieFilter) skip(r rune) bool {
+func (filter *TrieFilter) skip(r rune) bool {
 	// 太影响效率
-	if /* unicode.IsSpace(r) || unicode.IsPunct(r) || */ this.inExclude(r) {
+	if /* unicode.IsSpace(r) || unicode.IsPunct(r) || */ filter.inExclude(r) {
 		return true
 	}
 	return false
 }
 
-func (this *TrieFilter) inExclude(r rune) bool {
-	_, ok := this.excludes[r]
+func (filter *TrieFilter) inExclude(r rune) bool {
+	_, ok := filter.excludes[r]
 	return ok
 }
 
-func (this *TrieFilter) Excludes(items ...rune) {
+func (filter *TrieFilter) Excludes(items ...rune) {
 	for _, item := range items {
-		this.excludes[clear(item)] = struct{}{}
+		filter.excludes[clear(item)] = struct{}{}
 	}
 }
 
-func (this *TrieFilter) Contains(text string) bool {
+func (filter *TrieFilter) Contains(text string) bool {
 	var node *trieNode
 	var tChars = []rune(text)
 
 	for _, r := range tChars {
 		r = clear(r)
 
-		if this.skip(r) {
+		if filter.skip(r) {
 			continue
 		}
 
@@ -108,7 +107,7 @@ func (this *TrieFilter) Contains(text string) bool {
 			node = node.getNode(r)
 		}
 		if node == nil {
-			node = this.root.getNode(r)
+			node = filter.root.getNode(r)
 		}
 
 		if node != nil && node.end {
@@ -118,16 +117,16 @@ func (this *TrieFilter) Contains(text string) bool {
 	return false
 }
 
-func (this *TrieFilter) FindFirst(text string) string {
+func (filter *TrieFilter) FindFirst(text string) string {
 	var node *trieNode
 	var tChars = []rune(text)
-	var nBuf = this.pool.Get().(*bytes.Buffer)
-	defer this.pool.Put(nBuf)
+	var nBuf = filter.pool.Get().(*bytes.Buffer)
+	defer filter.pool.Put(nBuf)
 
 	for _, r := range tChars {
 		var nr = clear(r)
 
-		if this.skip(nr) {
+		if filter.skip(nr) {
 			if node != nil {
 				nBuf.WriteRune(r)
 			} else {
@@ -141,7 +140,7 @@ func (this *TrieFilter) FindFirst(text string) string {
 		}
 		if node == nil {
 			nBuf.Reset()
-			node = this.root.getNode(nr)
+			node = filter.root.getNode(nr)
 		}
 
 		nBuf.WriteRune(r)
@@ -154,17 +153,17 @@ func (this *TrieFilter) FindFirst(text string) string {
 	return ""
 }
 
-func (this *TrieFilter) FindAll(text string) []string {
+func (filter *TrieFilter) FindAll(text string) []string {
 	var node *trieNode
 	var tChars = []rune(text)
-	var nBuf = this.pool.Get().(*bytes.Buffer)
-	defer this.pool.Put(nBuf)
+	var nBuf = filter.pool.Get().(*bytes.Buffer)
+	defer filter.pool.Put(nBuf)
 	var nText []string
 
 	for _, r := range tChars {
 		var nr = clear(r)
 
-		if this.skip(nr) {
+		if filter.skip(nr) {
 			if node != nil {
 				nBuf.WriteRune(r)
 			} else {
@@ -178,7 +177,7 @@ func (this *TrieFilter) FindAll(text string) []string {
 		}
 		if node == nil {
 			nBuf.Reset()
-			node = this.root.getNode(nr)
+			node = filter.root.getNode(nr)
 		}
 
 		nBuf.WriteRune(r)
@@ -193,7 +192,7 @@ func (this *TrieFilter) FindAll(text string) []string {
 	return nText
 }
 
-func (this *TrieFilter) Replace(text string, replace rune) string {
+func (filter *TrieFilter) Replace(text string, replace rune) string {
 	var node *trieNode
 	var tChars = []rune(text)
 
@@ -201,7 +200,7 @@ func (this *TrieFilter) Replace(text string, replace rune) string {
 	for i, r := range tChars {
 		r = clear(r)
 
-		if this.skip(r) {
+		if filter.skip(r) {
 			continue
 		}
 
@@ -210,7 +209,7 @@ func (this *TrieFilter) Replace(text string, replace rune) string {
 		}
 		if node == nil {
 			start = i
-			node = this.root.getNode(r)
+			node = filter.root.getNode(r)
 		}
 
 		if node != nil && node.end {

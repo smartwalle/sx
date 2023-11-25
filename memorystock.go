@@ -10,6 +10,6 @@ func NewMemoryStock(words ...string) (*MemoryStock, error) {
 	return s, nil
 }
 
-func (this *MemoryStock) ReadAll() []string {
-	return this.words
+func (ms *MemoryStock) ReadAll() []string {
+	return ms.words
 }

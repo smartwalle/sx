@@ -43,6 +43,6 @@ func NewFileStock(p string) (*FileStock, error) {
 	return s, nil
 }
 
-func (this *FileStock) ReadAll() []string {
-	return this.words
+func (fs *FileStock) ReadAll() []string {
+	return fs.words
 }
