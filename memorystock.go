@@ -5,11 +5,11 @@ type MemoryStock struct {
 }
 
 func NewMemoryStock(words ...string) (*MemoryStock, error) {
-	var s = &MemoryStock{}
-	s.words = words
-	return s, nil
+	var m = &MemoryStock{}
+	m.words = words
+	return m, nil
 }
 
-func (ms *MemoryStock) ReadAll() []string {
-	return ms.words
+func (m *MemoryStock) ReadAll() []string {
+	return m.words
 }

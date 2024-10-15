@@ -57,13 +57,13 @@ func (filter *TrieFilter) prepare(stock WordStock) {
 
 func (filter *TrieFilter) addNode(word string) {
 	var node = filter.root
-	var wChars = []rune(word)
+	var runes = []rune(word)
 
-	for _, r := range wChars {
+	for _, r := range runes {
 		if unicode.IsSpace(r) {
 			continue
 		}
-		r = clear(r)
+		r = clearRune(r)
 
 		if _, ok := node.children[r]; !ok {
 			node.children[r] = newTrieNode()
@@ -86,18 +86,18 @@ func (filter *TrieFilter) inExclude(r rune) bool {
 	return ok
 }
 
-func (filter *TrieFilter) Excludes(items ...rune) {
-	for _, item := range items {
-		filter.excludes[clear(item)] = struct{}{}
+func (filter *TrieFilter) Excludes(runes ...rune) {
+	for _, r := range runes {
+		filter.excludes[clearRune(r)] = struct{}{}
 	}
 }
 
 func (filter *TrieFilter) Contains(text string) bool {
 	var node *trieNode
-	var tChars = []rune(text)
+	var runes = []rune(text)
 
-	for _, r := range tChars {
-		r = clear(r)
+	for _, r := range runes {
+		r = clearRune(r)
 
 		if filter.skip(r) {
 			continue
@@ -119,18 +119,18 @@ func (filter *TrieFilter) Contains(text string) bool {
 
 func (filter *TrieFilter) FindFirst(text string) string {
 	var node *trieNode
-	var tChars = []rune(text)
-	var nBuf = filter.pool.Get().(*bytes.Buffer)
-	defer filter.pool.Put(nBuf)
+	var runes = []rune(text)
+	var buf = filter.pool.Get().(*bytes.Buffer)
+	defer filter.pool.Put(buf)
 
-	for _, r := range tChars {
-		var nr = clear(r)
+	for _, r := range runes {
+		var nr = clearRune(r)
 
 		if filter.skip(nr) {
 			if node != nil {
-				nBuf.WriteRune(r)
+				buf.WriteRune(r)
 			} else {
-				nBuf.Reset()
+				buf.Reset()
 			}
 			continue
 		}
@@ -139,14 +139,14 @@ func (filter *TrieFilter) FindFirst(text string) string {
 			node = node.getNode(nr)
 		}
 		if node == nil {
-			nBuf.Reset()
+			buf.Reset()
 			node = filter.root.getNode(nr)
 		}
 
-		nBuf.WriteRune(r)
+		buf.WriteRune(r)
 
 		if node != nil && node.end {
-			return nBuf.String()
+			return buf.String()
 		}
 	}
 
@@ -155,19 +155,19 @@ func (filter *TrieFilter) FindFirst(text string) string {
 
 func (filter *TrieFilter) FindAll(text string) []string {
 	var node *trieNode
-	var tChars = []rune(text)
-	var nBuf = filter.pool.Get().(*bytes.Buffer)
-	defer filter.pool.Put(nBuf)
-	var nText []string
+	var runes = []rune(text)
+	var buf = filter.pool.Get().(*bytes.Buffer)
+	defer filter.pool.Put(buf)
+	var texts []string
 
-	for _, r := range tChars {
-		var nr = clear(r)
+	for _, r := range runes {
+		var nr = clearRune(r)
 
 		if filter.skip(nr) {
 			if node != nil {
-				nBuf.WriteRune(r)
+				buf.WriteRune(r)
 			} else {
-				nBuf.Reset()
+				buf.Reset()
 			}
 			continue
 		}
@@ -176,29 +176,29 @@ func (filter *TrieFilter) FindAll(text string) []string {
 			node = node.getNode(nr)
 		}
 		if node == nil {
-			nBuf.Reset()
+			buf.Reset()
 			node = filter.root.getNode(nr)
 		}
 
-		nBuf.WriteRune(r)
+		buf.WriteRune(r)
 
 		if node != nil && node.end {
-			nText = append(nText, nBuf.String())
+			texts = append(texts, buf.String())
 			node = nil
-			nBuf.Reset()
+			buf.Reset()
 		}
 	}
 
-	return nText
+	return texts
 }
 
 func (filter *TrieFilter) Replace(text string, replace rune) string {
 	var node *trieNode
-	var tChars = []rune(text)
+	var runes = []rune(text)
 
 	var start = -1
-	for i, r := range tChars {
-		r = clear(r)
+	for i, r := range runes {
+		r = clearRune(r)
 
 		if filter.skip(r) {
 			continue
@@ -214,12 +214,12 @@ func (filter *TrieFilter) Replace(text string, replace rune) string {
 
 		if node != nil && node.end {
 			for b := start; b < i+1; b++ {
-				tChars[b] = replace
+				runes[b] = replace
 			}
 			node = nil
 			start = -1
 		}
 	}
 
-	return string(tChars)
+	return string(runes)
 }

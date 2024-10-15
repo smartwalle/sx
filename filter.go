@@ -5,7 +5,7 @@ type Filter interface {
 	// 比如:
 	// 将中线(-)设置为排除内容，同时将 "今天" 设置为敏感词
 	// 匹配的时候, "今天" 和 "今-天" 都将被判定为敏感词
-	Excludes(items ...rune)
+	Excludes(runes ...rune)
 
 	// Contains 用于检测是否有敏感词：如果有敏感词，返回 true；如果没有敏感词，返回 false；
 	Contains(text string) bool
@@ -20,7 +20,7 @@ type Filter interface {
 	Replace(text string, replace rune) string
 }
 
-func clear(r rune) rune {
+func clearRune(r rune) rune {
 	if r >= 65 && r <= 90 {
 		// 大写字母转换成小写字母
 		r += 32
